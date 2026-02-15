@@ -1,0 +1,385 @@
+// Flipkart-style Category Navigation Bar
+.category-navbar {
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  padding: 8px 0;
+  position: relative;
+  z-index: 100;
+  
+  .category-navbar-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+    overflow: visible;
+  }
+
+  .category-items {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    &.skeleton {
+      gap: 24px;
+
+      .category-item-skeleton {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        min-width: 72px;
+
+        .category-icon-skeleton {
+          width: 64px;
+          height: 64px;
+          background: linear-gradient(
+            90deg,
+            #f5f5f5 25%,
+            #e8e8e8 50%,
+            #f5f5f5 75%
+          );
+          background-size: 200% 100%;
+          animation: loading 1.5s infinite;
+        }
+
+        .category-name-skeleton {
+          width: 60px;
+          height: 11px;
+          border-radius: 2px;
+          background: linear-gradient(
+            90deg,
+            #f5f5f5 25%,
+            #e8e8e8 50%,
+            #f5f5f5 75%
+          );
+          background-size: 200% 100%;
+          animation: loading 1.5s infinite;
+        }
+      }
+    }
+  }
+
+  .category-item {
+    position: relative;
+    flex-shrink: 0;
+    text-align: center;
+
+    .category-link {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 4px;
+      text-decoration: none;
+      color: #212121;
+      transition: none;
+      min-width: 72px;
+      cursor: pointer;
+
+      &:hover {
+        .category-name {
+          color: #2874f0;
+          font-weight: 600;
+        }
+      }
+
+      .category-icon-wrapper {
+        width: 64px;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .category-icon {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
+
+        .category-icon-placeholder {
+          width: 64px;
+          height: 64px;
+          background: #f8f8f8;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          .category-icon-letter {
+            font-size: 22px;
+            font-weight: 600;
+            color: #878787;
+          }
+        }
+      }
+
+      .category-name {
+        font-size: 14px;
+        font-weight: 500;
+        color: #212121;
+        text-align: center;
+        line-height: 1.2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        max-width: 100px;
+        transition: all 0.15s ease;
+
+        .dropdown-icon {
+          font-size: 18px;
+          margin-left: -2px;
+        }
+      }
+    }
+
+    // Dropdown menu for subcategories (inline, not used with portal)
+    .category-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-top: 2px;
+      background: #fff;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.15s ease, visibility 0.15s ease;
+      z-index: 99999;
+      min-width: 200px;
+      max-width: 280px;
+      overflow: hidden;
+
+      &.category-dropdown-wide {
+        min-width: 240px;
+        max-width: 320px;
+      }
+
+      .category-dropdown-content {
+        padding: 10px 0;
+        max-height: 480px;
+        overflow-y: auto;
+
+        &::-webkit-scrollbar {
+          width: 6px;
+        }
+
+        &::-webkit-scrollbar-track {
+          background: transparent;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background: #d0d0d0;
+          border-radius: 3px;
+
+          &:hover {
+            background: #b0b0b0;
+          }
+        }
+
+        .category-dropdown-item {
+          display: block;
+          padding: 10px 20px;
+          color: #212121;
+          text-decoration: none;
+          font-size: 14px;
+          font-weight: 400;
+          transition: background-color 0.1s ease;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+
+          &:hover {
+            background-color: #f0f0f0;
+          }
+        }
+      }
+    }
+
+    // Show dropdown on hover
+    &:hover {
+      .category-dropdown {
+        opacity: 1;
+        visibility: visible;
+      }
+    }
+  }
+
+  // Special styling for "More" category
+  .category-more {
+    .category-icon-placeholder {
+      background: #f8f8f8;
+    }
+  }
+
+  // Badge/Label support (for "NEW" badges like Flipkart)
+  .category-badge {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    background: #ff6161;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 600;
+    padding: 2px 5px;
+    border-radius: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+}
+
+/* Global styles for portal-rendered floating dropdown (not nested under .category-navbar) */
+.floating-dropdown {
+  position: fixed;
+  background: #fff;
+  border: none;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 99999;
+  min-width: 200px;
+  max-width: 280px;
+  overflow: hidden;
+}
+
+.floating-dropdown .category-dropdown-content {
+  padding: 10px 0;
+  max-height: 480px;
+  overflow-y: auto;
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #d0d0d0;
+    border-radius: 3px;
+
+    &:hover {
+      background: #b0b0b0;
+    }
+  }
+}
+
+.floating-dropdown .category-dropdown-item {
+  display: block;
+  padding: 10px 20px;
+  color: #212121;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 400;
+  white-space: nowrap;
+  transition: background-color 0.1s ease;
+}
+
+.floating-dropdown .category-dropdown-item:hover {
+  background-color: #f0f0f0;
+}
+
+// Loading animation
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .category-navbar {
+    padding: 8px 0;
+
+    .category-navbar-wrapper {
+      padding: 0 15px;
+    }
+
+    .category-items {
+      gap: 12px;
+      padding-right: 15px;
+    }
+
+    .category-item {
+      .category-link {
+        min-width: 60px;
+        padding: 4px 2px;
+        gap: 6px;
+
+        .category-icon-wrapper {
+          width: 50px;
+          height: 50px;
+
+          .category-icon-placeholder {
+            width: 50px;
+            height: 50px;
+
+            .category-icon-letter {
+              font-size: 18px;
+            }
+          }
+        }
+
+        .category-name {
+          font-size: 12px;
+          max-width: 60px;
+
+          .dropdown-icon {
+            display: none;
+          }
+        }
+      }
+
+      // Disable dropdowns on mobile
+      .category-dropdown {
+        display: none;
+      }
+    }
+  }
+  
+  .floating-dropdown {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .category-navbar {
+    .category-items {
+      gap: 8px;
+    }
+
+    .category-item {
+      .category-link {
+        min-width: 55px;
+        padding: 4px 2px;
+
+        .category-icon-wrapper {
+          width: 45px;
+          height: 45px;
+
+          .category-icon-placeholder {
+            width: 45px;
+            height: 45px;
+
+            .category-icon-letter {
+              font-size: 16px;
+            }
+          }
+        }
+
+        .category-name {
+          font-size: 11px;
+          max-width: 55px;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,85 @@
+/* Custom Navbar Styles - Multi-line Category Layout */
+
+/* Make navbar wrap to multiple lines */
+.main-navbar .navbar-nav {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  max-width: 100% !important;
+  align-items: flex-start !important;
+  gap: 0 !important;
+}
+
+/* Adjust menu items for multi-line layout */
+.main-navbar .navbar-nav > .nav-item {
+  flex: 0 0 auto !important;
+  white-space: nowrap !important;
+}
+
+/* Reduce padding and font size for better fit */
+.main-navbar .navbar-nav > .nav-item > a,
+.main-navbar .navbar-nav > .nav-item > .nav-link {
+  padding: 15px 16px !important;
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+}
+
+/* Adjust dropdown arrow spacing */
+.main-navbar .navbar-nav .dropdown-toggle::after {
+  margin-left: 4px !important;
+}
+
+/* Adjust header nav middle container */
+.header-nav-middle {
+  padding: 0 !important;
+}
+
+/* Make main nav container wrap */
+.main-nav.navbar {
+  flex-wrap: wrap !important;
+  padding: 0 !important;
+}
+
+/* Adjust offcanvas body */
+.offcanvas-body {
+  padding: 0 15px !important;
+}
+
+/* Ensure dropdown menus don't break layout */
+.main-navbar .dropdown-menu {
+  top: 100% !important;
+  margin-top: 0 !important;
+}
+
+/* Responsive adjustments */
+@media (min-width: 1200px) {
+  .main-navbar .navbar-nav {
+    min-height: auto !important;
+  }
+
+  /* Adjust metro header for better spacing */
+  .metro .main-menu .menu-right .main-navbar {
+    display: flex !important;
+    align-items: flex-start !important;
+  }
+
+  .metro .main-menu .menu-right .main-navbar #mainnav {
+    width: 100% !important;
+  }
+}
+
+/* Adjust header height for wrapped content */
+.metro .main-menu {
+  min-height: auto !important;
+}
+
+/* For sticky header */
+header.sticky .main-navbar .navbar-nav > .nav-item > a,
+header.sticky .main-navbar .navbar-nav > .nav-item > .nav-link {
+  padding: 12px 14px !important;
+}
+
+/* Better spacing for dropdown items */
+.main-navbar .nav-item.dropdown:hover .dropdown-menu,
+.main-navbar .nav-item.dropdown.show .dropdown-menu {
+  display: block !important;
+}

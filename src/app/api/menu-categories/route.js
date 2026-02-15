@@ -1,0 +1,96 @@
+import { NextResponse } from "next/server";
+
+/**
+ * Transform categories into menu format
+ */
+function transformCategoriesToMenu(categories) {
+  return categories.map((category, index) => {
+    const hasChildren =
+      category.subcategories && category.subcategories.length > 0;
+
+    return {
+      id: category.id,
+      title: category.name,
+      sort: index.toString(),
+      link_type: hasChildren ? "sub" : "link",
+      is_target_blank: 0,
+      mega_menu: 0,
+      mega_menu_type: "simple",
+      slug: category.slug,
+      type: null,
+      path: hasChildren ? null : `/collection?category=${category.slug}`,
+      badge_text: null,
+      badge_color: null,
+      content_item: null,
+      item_image_id: null,
+      banner_image_id: null,
+      set_page_link: null,
+      parent_id: null,
+      created_by_id: "1",
+      created_at: category.created_at,
+      product_ids: [],
+      blog_ids: [],
+      item_image: category.category_image || null,
+      banner_image: null,
+      child: hasChildren
+        ? transformCategoriesToMenu(category.subcategories)
+        : [],
+    };
+  });
+}
+
+export async function GET(request) {
+  try {
+    // Fetch categories from admin panel with tree structure
+    const adminApiUrl =
+      "http://localhost:3000/api/category?type=product&include_subcategories=true&status=1";
+
+    const response = await fetch(adminApiUrl, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      cache: "no-store", // Ensure fresh data
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch categories from admin panel");
+    }
+
+    const data = await response.json();
+
+    if (!data.success || !data.data) {
+      throw new Error("Invalid response from admin panel");
+    }
+
+    // Transform categories to menu format
+    const menuItems = transformCategoriesToMenu(data.data);
+
+    // Return in the expected menu format
+    return NextResponse.json({
+      current_page: 1,
+      data: menuItems,
+      first_page_url: null,
+      from: 1,
+      last_page: 1,
+      last_page_url: null,
+      links: [],
+      next_page_url: null,
+      path: null,
+      per_page: menuItems.length,
+      prev_page_url: null,
+      to: menuItems.length,
+      total: menuItems.length,
+    });
+  } catch (error) {
+    console.error("Error fetching menu categories:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Failed to fetch menu categories",
+        error: error.message,
+      },
+      { status: 500 }
+    );
+  }
+}
