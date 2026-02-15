@@ -80,7 +80,10 @@ const ProductBox1 = ({ productState, setProductState }) => {
 
         {/* Display Vendor Name for vendor products */}
         {productState?.product?.vendor_name && (
-          <p className="vendor-name" style={{ fontSize: '12px', color: '#777', marginTop: '4px' }}>
+          <p
+            className="vendor-name"
+            style={{ fontSize: "12px", color: "#777", marginTop: "4px" }}
+          >
             Sold by: <strong>{productState?.product?.vendor_name}</strong>
           </p>
         )}
@@ -88,10 +91,10 @@ const ProductBox1 = ({ productState, setProductState }) => {
         <h4 className="price">
           {productState?.selectedVariation
             ? convertCurrency(
-                Number(productState?.selectedVariation.sale_price).toFixed(2)
+                Number(productState?.selectedVariation.sale_price).toFixed(2),
               )
             : convertCurrency(
-                Number(productState?.product?.sale_price).toFixed(2)
+                Number(productState?.product?.sale_price).toFixed(2),
               )}
           {productState?.selectedVariation ? (
             <>

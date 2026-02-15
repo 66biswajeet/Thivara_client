@@ -39,17 +39,17 @@ function transformProduct(product) {
     : null;
 
   const normalizedThumbnail = normalizeImage(
-    primaryMedia?.url || product.product_thumbnail || primaryMedia
+    primaryMedia?.url || product.product_thumbnail || primaryMedia,
   );
   const normalizedGalleries =
     Array.isArray(product.product_galleries) && product.product_galleries.length
       ? product.product_galleries.map(normalizeImage).filter(Boolean)
       : Array.isArray(product.media)
-      ? product.media
-          .filter((m) => m.type === "image")
-          .map((m) => normalizeImage(m.url || m))
-          .filter(Boolean)
-      : [];
+        ? product.media
+            .filter((m) => m.type === "image")
+            .map((m) => normalizeImage(m.url || m))
+            .filter(Boolean)
+        : [];
 
   const normalizedVariations = Array.isArray(product.variations)
     ? product.variations.map((v) => ({
@@ -70,15 +70,15 @@ function transformProduct(product) {
     price: Number.isFinite(parseFloat(product.standard_price))
       ? parseFloat(product.standard_price)
       : Number.isFinite(parseFloat(product.price))
-      ? parseFloat(product.price)
-      : 0,
+        ? parseFloat(product.price)
+        : 0,
     sale_price: Number.isFinite(parseFloat(product.sale_price))
       ? parseFloat(product.sale_price)
       : Number.isFinite(parseFloat(product.standard_price))
-      ? parseFloat(product.standard_price)
-      : Number.isFinite(parseFloat(product.price))
-      ? parseFloat(product.price)
-      : 0,
+        ? parseFloat(product.standard_price)
+        : Number.isFinite(parseFloat(product.price))
+          ? parseFloat(product.price)
+          : 0,
     discount: product.discount,
     is_featured: product.is_featured,
     shipping_days: product.shipping_days,
@@ -169,38 +169,47 @@ export async function GET(_, { params }) {
 
     // Check if this is a vendor product ID (ObjectId format - 24 hex chars) or slug
     const isObjectId = /^[a-fA-F0-9]{24}$/.test(productId);
-    const isVendorProductSlug = productId.includes('-') && productId.length > 30;
-    
+    const isVendorProductSlug =
+      productId.includes("-") && productId.length > 30;
+
     // Try to fetch from vendor-products API first for vendor products
     if (isObjectId || isVendorProductSlug) {
       try {
-        const vendorProductUrl = isObjectId 
+        const vendorProductUrl = isObjectId
           ? `http://localhost:3001/api/vendor-products?vendor_product_id=${productId}`
           : `http://localhost:3001/api/vendor-products?slug=${productId}`;
-        
-        const vendorProductResponse = await fetch(
-          vendorProductUrl,
-          {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-            cache: "no-store",
-          }
-        );
+
+        const vendorProductResponse = await fetch(vendorProductUrl, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          cache: "no-store",
+        });
 
         if (vendorProductResponse.ok) {
           const vendorData = await vendorProductResponse.json();
           // Find the specific vendor product
           const vendorProduct = isObjectId
-            ? vendorData.data?.find(p => p.vendor_product_id?.toString() === productId || p.id?.toString() === productId)
-            : vendorData.data?.find(p => p.slug === productId);
-          
+            ? vendorData.data?.find(
+                (p) =>
+                  p.vendor_product_id?.toString() === productId ||
+                  p.id?.toString() === productId,
+              )
+            : vendorData.data?.find((p) => p.slug === productId);
+
           if (vendorProduct) {
-            console.log("✅ Found vendor product:", vendorProduct.id, vendorProduct.vendor_name);
+            console.log(
+              "✅ Found vendor product:",
+              vendorProduct.id,
+              vendorProduct.vendor_name,
+            );
             return NextResponse.json(vendorProduct);
           }
         }
       } catch (e) {
-        console.log("Not a vendor product, trying master product...", e.message);
+        console.log(
+          "Not a vendor product, trying master product...",
+          e.message,
+        );
       }
     }
 
@@ -233,7 +242,7 @@ export async function GET(_, { params }) {
         response = fallbackResponse;
       } else {
         throw new Error(
-          `Failed to fetch product from admin panel (tried ${primaryUrl} and ${fallbackUrl})`
+          `Failed to fetch product from admin panel (tried ${primaryUrl} and ${fallbackUrl})`,
         );
       }
     }
@@ -250,7 +259,7 @@ export async function GET(_, { params }) {
     console.error("Error fetching product:", error);
     return NextResponse.json(
       { success: false, message: "Product not found" },
-      { status: 404 }
+      { status: 404 },
     );
   }
 }

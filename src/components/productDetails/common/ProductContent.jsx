@@ -14,7 +14,14 @@ import SizeModal from "./allModal/SizeModal";
 import ProductAttribute from "./productAttribute/ProductAttribute";
 import ProductDetailAction from "./ProductDetailAction";
 
-const ProductContent = ({ productState, setProductState, productAccordion, noDetails, noQuantityButtons, noModals }) => {
+const ProductContent = ({
+  productState,
+  setProductState,
+  productAccordion,
+  noDetails,
+  noQuantityButtons,
+  noModals,
+}) => {
   const { t } = useTranslation("common");
   const { handleIncDec, isLoading } = useContext(CartContext);
   const { convertCurrency } = useContext(SettingContext);
@@ -22,76 +29,144 @@ const ProductContent = ({ productState, setProductState, productAccordion, noDet
   const router = useRouter();
   const addToCart = () => {
     setCartCanvas(true);
-    handleIncDec(productState?.productQty, productState?.product, false, false, false, productState);
+    handleIncDec(
+      productState?.productQty,
+      productState?.product,
+      false,
+      false,
+      false,
+      productState,
+    );
   };
   const buyNow = () => {
-    handleIncDec(productState?.productQty, productState?.product, false, false, false, productState);
+    handleIncDec(
+      productState?.productQty,
+      productState?.product,
+      false,
+      false,
+      false,
+      productState,
+    );
     router.push(`/checkout`);
   };
   const [modal, setModal] = useState("");
   const activeModal = {
-    size: <SizeModal modal={modal} setModal={setModal} productState={productState} />,
-    delivery: <DeliveryReturnModal modal={modal} setModal={setModal} productState={productState} />,
-    qna: <QuestionAnswerModal modal={modal} setModal={setModal} productState={productState} />,
+    size: (
+      <SizeModal
+        modal={modal}
+        setModal={setModal}
+        productState={productState}
+      />
+    ),
+    delivery: (
+      <DeliveryReturnModal
+        modal={modal}
+        setModal={setModal}
+        productState={productState}
+      />
+    ),
+    qna: (
+      <QuestionAnswerModal
+        modal={modal}
+        setModal={setModal}
+        productState={productState}
+      />
+    ),
   };
 
   return (
     <>
       {!noDetails && (
         <>
-          <h2 className="main-title">{productState?.selectedVariation?.name ?? productState?.product?.name}</h2>
-          
+          <h2 className="main-title">
+            {productState?.selectedVariation?.name ??
+              productState?.product?.name}
+          </h2>
+
           {/* Display Vendor Name for vendor products */}
           {productState?.product?.vendor_name && (
-            <div className="vendor-info" style={{ 
-              padding: '8px 12px', 
-              backgroundColor: '#f8f9fa', 
-              borderRadius: '4px', 
-              marginBottom: '12px',
-              fontSize: '14px'
-            }}>
-              <span style={{ color: '#666' }}>Sold by:</span>{' '}
-              <strong style={{ color: '#1a73e8' }}>{productState?.product?.vendor_name}</strong>
+            <div
+              className="vendor-info"
+              style={{
+                padding: "8px 12px",
+                backgroundColor: "#f8f9fa",
+                borderRadius: "4px",
+                marginBottom: "12px",
+                fontSize: "14px",
+              }}
+            >
+              <span style={{ color: "#666" }}>Sold by:</span>{" "}
+              <strong style={{ color: "#1a73e8" }}>
+                {productState?.product?.vendor_name}
+              </strong>
             </div>
           )}
 
           {!productState?.product?.is_external && (
             <div className="product-rating">
-              <RatingBox totalRating={productState?.selectedVariation?.rating_count ?? productState?.product?.rating_count} />
+              <RatingBox
+                totalRating={
+                  productState?.selectedVariation?.rating_count ??
+                  productState?.product?.rating_count
+                }
+              />
               <span className="divider">|</span>
               <a href={Href} className="mb-0">
-                {productState?.selectedVariation?.reviews_count || productState?.product?.reviews_count || 0} {t("Review")}
+                {productState?.selectedVariation?.reviews_count ||
+                  productState?.product?.reviews_count ||
+                  0}{" "}
+                {t("Review")}
               </a>
             </div>
           )}
           <div className="price-text">
             <h3>
               <span className="text-dark fw-normal">MRP:</span>
-              {productState?.selectedVariation?.sale_price ? convertCurrency(productState?.selectedVariation?.sale_price) : convertCurrency(productState?.product?.sale_price)}
+              {productState?.selectedVariation?.sale_price
+                ? convertCurrency(productState?.selectedVariation?.sale_price)
+                : convertCurrency(productState?.product?.sale_price)}
 
-              {productState?.selectedVariation?.discount || productState?.product?.discount ? <del>{productState?.selectedVariation ? convertCurrency(productState?.selectedVariation?.price) : convertCurrency(productState?.product?.price)}</del> : null}
+              {productState?.selectedVariation?.discount ||
+              productState?.product?.discount ? (
+                <del>
+                  {productState?.selectedVariation
+                    ? convertCurrency(productState?.selectedVariation?.price)
+                    : convertCurrency(productState?.product?.price)}
+                </del>
+              ) : null}
 
-              {productState?.selectedVariation?.discount || productState?.product?.discount ? (
+              {productState?.selectedVariation?.discount ||
+              productState?.product?.discount ? (
                 <span className="discounted-price">
-                  {productState?.selectedVariation ? productState?.selectedVariation?.discount : productState?.product?.discount} % {t("Off")}
+                  {productState?.selectedVariation
+                    ? productState?.selectedVariation?.discount
+                    : productState?.product?.discount}{" "}
+                  % {t("Off")}
                 </span>
               ) : null}
             </h3>
             <span>{t("InclusiveAllTheTax")}</span>
           </div>
-          {productState?.product.short_description && <p className="description-text">{productState?.product.short_description}</p>}
+          {productState?.product.short_description && (
+            <p className="description-text">
+              {productState?.product.short_description}
+            </p>
+          )}
         </>
       )}
       {!noModals ? (
-        productState?.product?.size_chart_image || productState?.product?.is_return ? (
+        productState?.product?.size_chart_image ||
+        productState?.product?.is_return ? (
           <>
             <div className="size-delivery-info">
-              {productState?.product?.size_chart_image && productState?.product?.size_chart_image.original_url && (
-                <a href={Href} onClick={() => setModal("size")}>
-                  <RiRulerLine /> {t("SizeChart")}
-                </a>
-              )}
-              {themeOption?.product?.shipping_and_return && productState?.product?.is_return ? (
+              {productState?.product?.size_chart_image &&
+                productState?.product?.size_chart_image.original_url && (
+                  <a href={Href} onClick={() => setModal("size")}>
+                    <RiRulerLine /> {t("SizeChart")}
+                  </a>
+                )}
+              {themeOption?.product?.shipping_and_return &&
+              productState?.product?.is_return ? (
                 <a href={Href} onClick={() => setModal("delivery")}>
                   <RiTruckLine /> {t("DeliveryReturn")}
                 </a>
@@ -109,16 +184,36 @@ const ProductContent = ({ productState, setProductState, productAccordion, noDet
         <>
           {productState?.selectedVariation?.short_description && (
             <div className="product-contain">
-              <p>{productState?.selectedVariation?.short_description ?? productState?.product?.short_description}</p>
+              <p>
+                {productState?.selectedVariation?.short_description ??
+                  productState?.product?.short_description}
+              </p>
             </div>
           )}
-          {productState?.product.status && !productAccordion && <>{productState?.product?.type == "classified" && <ProductAttribute productState={productState} setProductState={setProductState} />}</>}
+          {productState?.product.status && !productAccordion && (
+            <>
+              {productState?.product?.type == "classified" && (
+                <ProductAttribute
+                  productState={productState}
+                  setProductState={setProductState}
+                />
+              )}
+            </>
+          )}
         </>
       )}
       {!productAccordion && (
         <div className="product-buttons">
-          <ProductDetailAction productState={productState} setProductState={setProductState} />
-          <AddToCartButton productState={productState} isLoading={isLoading} addToCart={addToCart} buyNow={buyNow} />
+          <ProductDetailAction
+            productState={productState}
+            setProductState={setProductState}
+          />
+          <AddToCartButton
+            productState={productState}
+            isLoading={isLoading}
+            addToCart={addToCart}
+            buyNow={buyNow}
+          />
         </div>
       )}
     </>

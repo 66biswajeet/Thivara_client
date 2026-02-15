@@ -27,7 +27,7 @@ const CollectionProducts = ({ filter, grid, infiniteScroll, categorySlug }) => {
     // Use VendorProductAPI for category pages to show only vendor products
     // Use regular ProductAPI for other contexts
     const apiUrl = categorySlug ? VendorProductAPI : ProductAPI;
-    
+
     return request({
       url: apiUrl,
       params: {
@@ -37,7 +37,7 @@ const CollectionProducts = ({ filter, grid, infiniteScroll, categorySlug }) => {
         field: filter?.field ?? "created_at",
         price: filter?.price.join(",") ?? "",
         category_slug: categorySlug || null,
-        category: !categorySlug ? (filter?.category.join(",") || tagParam) : null,
+        category: !categorySlug ? filter?.category.join(",") || tagParam : null,
         brand: filter.brand.join(","),
         sort: "",
         sortBy: filter?.sortBy ?? "asc",
@@ -49,23 +49,33 @@ const CollectionProducts = ({ filter, grid, infiniteScroll, categorySlug }) => {
     });
   };
 
-  const { data, fetchNextPage, isRefetching, isLoading, fetchStatus, refetch } = useInfiniteQuery({
-    queryKey: ["infiniteScroll",filter],
-    queryFn: fetchData,
-    retryOnMount: false,
-    enabled: false,
-    getNextPageParam: ({ page, last_page }) => last_page > page && { page: page + 1 },
-  });
+  const { data, fetchNextPage, isRefetching, isLoading, fetchStatus, refetch } =
+    useInfiniteQuery({
+      queryKey: ["infiniteScroll", filter],
+      queryFn: fetchData,
+      retryOnMount: false,
+      enabled: false,
+      getNextPageParam: ({ page, last_page }) =>
+        last_page > page && { page: page + 1 },
+    });
 
   const onLoad = () => {
-    if (!isLoading && data?.pages?.[data?.pages?.length - 1]?.data?.data?.last_page !== infiniteScrollData.length) {
+    if (
+      !isLoading &&
+      data?.pages?.[data?.pages?.length - 1]?.data?.data?.last_page !==
+        infiniteScrollData.length
+    ) {
       setPage(page + 1);
     }
   };
 
   useEffect(() => {
     if (data?.pages?.length > 0) {
-      data?.pages[data?.pages?.length - 1]?.data?.data?.length && setInfiniteScrollData([...infiniteScrollData, data?.pages[data?.pages?.length - 1]?.data?.data]);
+      data?.pages[data?.pages?.length - 1]?.data?.data?.length &&
+        setInfiniteScrollData([
+          ...infiniteScrollData,
+          data?.pages[data?.pages?.length - 1]?.data?.data,
+        ]);
     }
   }, [data]);
 
@@ -93,9 +103,9 @@ const CollectionProducts = ({ filter, grid, infiniteScroll, categorySlug }) => {
   }, [categorySlug]);
 
   useEffect(() => {
-    refetch()
+    refetch();
     setInfiniteScrollData([]); // Reset infinite scroll data when filter changes
-  setPage(1); 
+    setPage(1);
   }, [refetch, filter]);
 
   return (
@@ -108,15 +118,24 @@ const CollectionProducts = ({ filter, grid, infiniteScroll, categorySlug }) => {
             </Col>
           ))}
         </Row>
-      ) : data?.pages?.length > 0 && data.pages[data?.pages?.length - 1]?.data?.data?.length ? (
-        <div className={`product-wrapper-grid ${infiniteScroll ? "product-load-more" : ""} ${grid == "list" ? "list-view" : ""} ${themeOption?.product?.full_border ? "full_border" : ""} ${themeOption?.product?.image_bg ? "product_img_bg" : ""} ${themeOption?.product?.product_box_bg ? "full_bg" : ""} ${themeOption?.product?.product_box_border ? "product_border" : ""}`}>
+      ) : data?.pages?.length > 0 &&
+        data.pages[data?.pages?.length - 1]?.data?.data?.length ? (
+        <div
+          className={`product-wrapper-grid ${infiniteScroll ? "product-load-more" : ""} ${grid == "list" ? "list-view" : ""} ${themeOption?.product?.full_border ? "full_border" : ""} ${themeOption?.product?.image_bg ? "product_img_bg" : ""} ${themeOption?.product?.product_box_bg ? "full_bg" : ""} ${themeOption?.product?.product_box_border ? "product_border" : ""}`}
+        >
           {!infiniteScroll ? (
             <Row className="g-xl-4 g-lg-3 g-sm-4 g-3">
-              {data?.pages[data.pages.length - 1]?.data?.data?.map((product, i) => (
-                <Col className={adjustGrid} key={i}>
-                  {grid == "list" ? <ListProductBox product={product} /> : <ProductBox product={product} style="vertical" />}
-                </Col>
-              ))}
+              {data?.pages[data.pages.length - 1]?.data?.data?.map(
+                (product, i) => (
+                  <Col className={adjustGrid} key={i}>
+                    {grid == "list" ? (
+                      <ListProductBox product={product} />
+                    ) : (
+                      <ProductBox product={product} style="vertical" />
+                    )}
+                  </Col>
+                ),
+              )}
             </Row>
           ) : (
             <Row className="g-xl-4 g-lg-3 g-sm-4 g-3">
@@ -133,20 +152,40 @@ const CollectionProducts = ({ filter, grid, infiniteScroll, categorySlug }) => {
           )}
         </div>
       ) : (
-        <NoDataFound customClass="no-data-added " title="NoProductFound" description="Please check if you have misspelt something or try searching with other way." height="345" width="345" imageUrl={`/assets/svg/empty-items.svg`} />
+        <NoDataFound
+          customClass="no-data-added "
+          title="NoProductFound"
+          description="Please check if you have misspelt something or try searching with other way."
+          height="345"
+          width="345"
+          imageUrl={`/assets/svg/empty-items.svg`}
+        />
       )}
       {!infiniteScroll ? (
         data?.pages[data.pages.length - 1]?.data?.data?.length > 0 && (
           <div className="product-pagination">
             <div className="theme-pagination-block">
               <nav>
-                <Pagination current_page={data?.pages[data.pages.length - 1]?.data.current_page} total={data?.pages[data.pages.length - 1]?.data?.total} per_page={data?.pages[data.pages.length - 1]?.data?.per_page} setPage={setPage} />
+                <Pagination
+                  current_page={
+                    data?.pages[data.pages.length - 1]?.data.current_page
+                  }
+                  total={data?.pages[data.pages.length - 1]?.data?.total}
+                  per_page={data?.pages[data.pages.length - 1]?.data?.per_page}
+                  setPage={setPage}
+                />
               </nav>
             </div>
           </div>
         )
       ) : (
-        <div className="load-more-sec">{fetchStatus != "idle" ? <img src={`${ImagePath}/loader.gif`} /> : <a onClick={() => onLoad()}>{t("LoadMore")}</a>}</div>
+        <div className="load-more-sec">
+          {fetchStatus != "idle" ? (
+            <img src={`${ImagePath}/loader.gif`} />
+          ) : (
+            <a onClick={() => onLoad()}>{t("LoadMore")}</a>
+          )}
+        </div>
       )}
     </>
   );

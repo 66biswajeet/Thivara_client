@@ -46,14 +46,17 @@ const CategoryMainPage = ({ slug }) => {
   }, [brand, attribute, price, rating, sortBy, field, page]);
 
   const { categoryIsLoading, categoryData } = useContext(CategoryContext);
-  
+
   // Check if current category has subcategories
   const currentCategory = categoryData?.find((cat) => cat.slug === slug);
-  const hasSubcategories = (currentCategory?.subcategories || 
-                           currentCategory?.children || 
-                           currentCategory?.sub_categories || 
-                           []).length > 0;
-  
+  const hasSubcategories =
+    (
+      currentCategory?.subcategories ||
+      currentCategory?.children ||
+      currentCategory?.sub_categories ||
+      []
+    ).length > 0;
+
   if (categoryIsLoading) return <Loader />;
   return (
     <>
@@ -63,7 +66,7 @@ const CategoryMainPage = ({ slug }) => {
       />
       {/* Show subcategory cards only if there are subcategories */}
       {hasSubcategories && <SubcategoryCards categorySlug={slug} />}
-      
+
       {/* Always show vendor products - whether it's a parent category or subcategory */}
       <CollectionLeftSidebar
         filter={filter}
