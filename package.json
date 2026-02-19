@@ -41,7 +41,7 @@
     "yup": "^1.6.1"
   },
   "devDependencies": {
-    "eslint": "^8",
+    "eslint": "^9",
     "eslint-config-next": "^16.1.1",
     "file-loader": "^6.2.0",
     "sass": "1.77.6"
