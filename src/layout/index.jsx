@@ -13,8 +13,12 @@ import ProductIdsProvider from "@/context/productIdsContext/ProductIdsProvider";
 import SettingProvider from "@/context/settingContext/SettingProvider";
 import ThemeOptionProvider from "@/context/themeOptionsContext/ThemeOptionProvider";
 import WishlistProvider from "@/context/wishlistContext/WishlistProvider";
-import { HydrationBoundary, QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState } from "react";
+import {
+  HydrationBoundary,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
+import { Suspense, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import SubLayout from "./SubLayout";
 
@@ -38,7 +42,9 @@ const MainLayout = ({ children }) => {
                                 <BrandIdsProvider>
                                   <BlogIdsProvider>
                                     <ProductProvider>
-                                      <SubLayout children={children} />
+                                      <Suspense fallback={<div />}>
+                                        <SubLayout children={children} />
+                                      </Suspense>
                                     </ProductProvider>
                                   </BlogIdsProvider>
                                 </BrandIdsProvider>
@@ -55,7 +61,7 @@ const MainLayout = ({ children }) => {
           </SettingProvider>
         </HydrationBoundary>
       </QueryClientProvider>
-      <ToastContainer autoClose={2000} theme="colored" />
+      <ToastContainer />
     </>
   );
 };

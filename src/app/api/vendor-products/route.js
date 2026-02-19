@@ -18,12 +18,7 @@ function transformVendorProduct(product) {
       return { original_url: url };
     }
     if (typeof img === "object") {
-      const url =
-        img.original_url ||
-        img.url ||
-        img.path ||
-        img.src ||
-        null;
+      const url = img.original_url || img.url || img.path || img.src || null;
       if (!url) return null;
       const finalUrl = url.startsWith("http")
         ? url
@@ -35,10 +30,9 @@ function transformVendorProduct(product) {
 
   // Normalize media array
   const normalizedThumbnail = normalizeImage(product.product_thumbnail);
-  const normalizedGalleries =
-    Array.isArray(product.product_galleries)
-      ? product.product_galleries.map(normalizeImage).filter(Boolean)
-      : Array.isArray(product.media)
+  const normalizedGalleries = Array.isArray(product.product_galleries)
+    ? product.product_galleries.map(normalizeImage).filter(Boolean)
+    : Array.isArray(product.media)
       ? product.media.map((m) => normalizeImage(m.url || m)).filter(Boolean)
       : [];
 
@@ -51,7 +45,7 @@ function transformVendorProduct(product) {
     description: product.description,
     type: product.type,
     sku: product.sku,
-    
+
     // Vendor-specific pricing
     price: Number.isFinite(parseFloat(product.price))
       ? parseFloat(product.price)
@@ -65,27 +59,27 @@ function transformVendorProduct(product) {
     floor_price: Number.isFinite(parseFloat(product.floor_price))
       ? parseFloat(product.floor_price)
       : 0,
-    
+
     // Stock and availability
     quantity: product.stock_quantity || 0,
     stock_quantity: product.stock_quantity || 0,
     stock_status: product.stock_status,
-    
+
     // Vendor information
     vendor_id: product.vendor_id,
     vendor_name: product.vendor_name,
     vendor_email: product.vendor_email,
-    
+
     // Product details
     condition: product.condition,
     shipping_info: product.shipping_info,
     shipping_weight: product.shipping_weight,
     dimensions: product.dimensions,
-    
+
     // Images
     product_thumbnail: normalizedThumbnail,
     product_galleries: normalizedGalleries,
-    
+
     // Categories and brand
     categories: product.category_id
       ? [
@@ -107,19 +101,20 @@ function transformVendorProduct(product) {
         }
       : product.brand,
     brand_id: product.brand_id,
-    
+
     // Other attributes
     slug: product.slug,
-    status: product.status,
+    status: product.status || 1,
     is_active: product.is_active,
     attribute_values: product.attribute_values || [],
     variant_values: product.variant_values || [],
     selected_variants: product.selected_variants || {},
-    
+    type: product.type || "simple", // Ensure type is set (default to simple)
+
     // Metadata
     created_at: product.created_at,
     updated_at: product.updated_at,
-    
+
     // Default values for client compatibility
     is_featured: false,
     is_trending: false,
@@ -160,11 +155,11 @@ export async function GET(request) {
       console.error(
         "❌ Admin vendor-products API error:",
         response.status,
-        response.statusText
+        response.statusText,
       );
       return NextResponse.json(
         { success: false, message: "Failed to fetch vendor products" },
-        { status: response.status }
+        { status: response.status },
       );
     }
 
@@ -180,12 +175,20 @@ export async function GET(request) {
     // If requesting a specific product by slug or vendor_product_id, return just that product
     const vendorProductId = searchParams.get("vendor_product_id");
     if ((slug || vendorProductId) && data.data?.length > 0) {
-      const product = slug 
-        ? data.data.find(p => p.slug === slug)
-        : data.data.find(p => p.vendor_product_id?.toString() === vendorProductId || p.id?.toString() === vendorProductId);
-      
+      const product = slug
+        ? data.data.find((p) => p.slug === slug)
+        : data.data.find(
+            (p) =>
+              p.vendor_product_id?.toString() === vendorProductId ||
+              p.id?.toString() === vendorProductId,
+          );
+
       if (product) {
-        console.log("✅ Returning single vendor product:", product.id, product.vendor_name);
+        console.log(
+          "✅ Returning single vendor product:",
+          product.id,
+          product.vendor_name,
+        );
         return NextResponse.json(product);
       }
     }
@@ -195,7 +198,7 @@ export async function GET(request) {
     console.error("❌ Client vendor-products API error:", error);
     return NextResponse.json(
       { success: false, message: error.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

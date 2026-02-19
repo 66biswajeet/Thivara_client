@@ -8,7 +8,6 @@ import Slider from "react-slick";
 const HomeSlider = ({ bannerData, height, width, sliderClass }) => {
   const videoType = ["mp4", "webm", "ogg"];
   const [customBanners, setCustomBanners] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
 
   // Fetch store customization data
   useEffect(() => {
@@ -32,8 +31,6 @@ const HomeSlider = ({ bannerData, height, width, sliderClass }) => {
         }
       } catch (error) {
         console.error("Failed to fetch store customization:", error);
-      } finally {
-        setIsLoading(false);
       }
     };
 
@@ -156,13 +153,13 @@ const HomeSlider = ({ bannerData, height, width, sliderClass }) => {
             })}
           </Slider>
         ) : videoType.includes(
-            (bannerData?.banners?.[0] || bannerData) &&
-              (bannerData?.banners?.[0]?.image_url || bannerData?.image_url) &&
-              (bannerData?.banners?.[0]?.image_url?.substring(
-                bannerData?.banners?.[0]?.image_url?.lastIndexOf(".") + 1,
+            (displayBanners?.banners?.[0] || displayBanners) &&
+              (displayBanners?.banners?.[0]?.image_url || displayBanners?.image_url) &&
+              (displayBanners?.banners?.[0]?.image_url?.substring(
+                displayBanners?.banners?.[0]?.image_url?.lastIndexOf(".") + 1,
               ) ||
-                bannerData?.image_url?.substring(
-                  bannerData?.image_url?.lastIndexOf(".") + 1,
+                displayBanners?.image_url?.substring(
+                  displayBanners?.image_url?.lastIndexOf(".") + 1,
                 )),
           ) ? (
           <div
@@ -203,8 +200,8 @@ const HomeSlider = ({ bannerData, height, width, sliderClass }) => {
               >
                 <source
                   src={
-                    storageURL + bannerData?.banners?.[0]?.image_url ||
-                    bannerData?.image_url
+                    storageURL + displayBanners?.banners?.[0]?.image_url ||
+                    displayBanners?.image_url
                   }
                   type="video/mp4"
                 />
@@ -213,13 +210,12 @@ const HomeSlider = ({ bannerData, height, width, sliderClass }) => {
           </div>
         ) : (
           <ImageLink
-            imgUrl={bannerData?.banners?.[0] || bannerData}
+            imgUrl={displayBanners?.banners?.[0] || displayBanners}
             placeholder={`${ImagePath}/banner.png`}
             height={height}
             width={width}
           />
         )}
-        <div className="home-skeleton">
           <div className="skeleton-content">
             <div className="container">
               <div className="row">

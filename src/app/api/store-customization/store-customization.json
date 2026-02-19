@@ -1,0 +1,9 @@
+{
+  "carousel_images": [
+    {
+      "id": 1,
+      "image": "https://via.placeholder.com/1920x325?text=Carousel+Image+1",
+      "link": "/"
+    }
+  ]
+}

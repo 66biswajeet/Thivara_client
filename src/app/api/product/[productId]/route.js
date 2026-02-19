@@ -187,14 +187,22 @@ export async function GET(_, { params }) {
 
         if (vendorProductResponse.ok) {
           const vendorData = await vendorProductResponse.json();
-          // Find the specific vendor product
-          const vendorProduct = isObjectId
-            ? vendorData.data?.find(
-                (p) =>
-                  p.vendor_product_id?.toString() === productId ||
-                  p.id?.toString() === productId,
-              )
-            : vendorData.data?.find((p) => p.slug === productId);
+          // Handle both cases: single product object or array in data
+          let vendorProduct = null;
+
+          if (vendorData.id || vendorData.vendor_product_id) {
+            // vendor-products API returned a single product object directly
+            vendorProduct = vendorData;
+          } else if (vendorData.data && Array.isArray(vendorData.data)) {
+            // vendor-products API returned array in data field
+            vendorProduct = isObjectId
+              ? vendorData.data.find(
+                  (p) =>
+                    p.vendor_product_id?.toString() === productId ||
+                    p.id?.toString() === productId,
+                )
+              : vendorData.data.find((p) => p.slug === productId);
+          }
 
           if (vendorProduct) {
             console.log(
