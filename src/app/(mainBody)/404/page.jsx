@@ -4,7 +4,7 @@ import ThemeOptionContext from "@/context/themeOptionsContext";
 import Loader from "@/layout/loader";
 import React, { useContext } from "react";
 
-// Build done 
+// Build
 
 const PageNotFound = () => {
   const { isLoading } = useContext(ThemeOptionContext);
