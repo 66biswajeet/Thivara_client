@@ -223,12 +223,13 @@ export async function GET(_, { params }) {
 
     // Fallback to master product - Determine whether productId is an ObjectId or a slug
     const isMasterObjectId = /^[a-fA-F0-9]{24}$/.test(productId);
+    const ADMIN_HOST = process.env.ADMIN_HOST || "http://localhost:3000";
     const primaryUrl = isMasterObjectId
-      ? `http://localhost:3000/api/product/${productId}`
-      : `http://localhost:3000/api/product/slug/${productId}`;
+      ? `${ADMIN_HOST}/api/product/${productId}`
+      : `${ADMIN_HOST}/api/product/slug/${productId}`;
     const fallbackUrl = isMasterObjectId
-      ? `http://localhost:3000/api/product/slug/${productId}`
-      : `http://localhost:3000/api/product/${productId}`;
+      ? `${ADMIN_HOST}/api/product/slug/${productId}`
+      : `${ADMIN_HOST}/api/product/${productId}`;
 
     // Try primary URL first, then fallback URL if the first fails (covers slug vs id mismatches)
     let response = await fetch(primaryUrl, {

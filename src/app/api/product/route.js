@@ -191,17 +191,18 @@ export async function GET(request) {
     // If 'id' query param is present, try multiple admin endpoints to locate the single product
     if (productId) {
       const isObjectId = /^[a-fA-F0-9]{24}$/.test(productId);
+      const ADMIN_HOST = process.env.ADMIN_HOST || "http://localhost:3000";
 
       // Try a series of admin endpoints in order until one returns OK
       const tryEndpoints = [];
       // path style: /api/product/:id
-      tryEndpoints.push(`http://localhost:3000/api/product/${productId}`);
+      tryEndpoints.push(`${ADMIN_HOST}/api/product/${productId}`);
       // slug path: /api/product/slug/:slug
-      tryEndpoints.push(`http://localhost:3000/api/product/slug/${productId}`);
+      tryEndpoints.push(`${ADMIN_HOST}/api/product/slug/${productId}`);
       // query style: /api/product?id=...
-      tryEndpoints.push(`http://localhost:3000/api/product?id=${productId}`);
+      tryEndpoints.push(`${ADMIN_HOST}/api/product?id=${productId}`);
       // query style slug param (some APIs use slug=)
-      tryEndpoints.push(`http://localhost:3000/api/product?slug=${productId}`);
+      tryEndpoints.push(`${ADMIN_HOST}/api/product?slug=${productId}`);
 
       let response = null;
       let lastErrorBody = null;
@@ -291,7 +292,8 @@ export async function GET(request) {
 
     // Otherwise, fetch product list
     const queryString = searchParams.toString();
-    const adminApiUrl = `http://localhost:3000/api/product${
+    const ADMIN_HOST = process.env.ADMIN_HOST || "http://localhost:3000";
+    const adminApiUrl = `${ADMIN_HOST}/api/product${
       queryString ? `?${queryString}` : ""
     }`;
 

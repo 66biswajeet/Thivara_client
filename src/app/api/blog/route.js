@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
+import { setCorsHeaders, handleCorsPreFlight } from "@/lib/cors";
 import blog from "./blog.json";
+
+export async function OPTIONS(request) {
+  return handleCorsPreFlight(request);
+}
 
 export async function GET(request) {
   const searchParams = request?.nextUrl?.searchParams;
@@ -61,5 +66,6 @@ export async function GET(request) {
     data: paginatedBlogs, // the blogs for the current page
   };
 
-  return NextResponse.json(response);
+  const response_obj = NextResponse.json(response);
+  return setCorsHeaders(response_obj);
 }
