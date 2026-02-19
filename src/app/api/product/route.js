@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { setCorsHeaders, handleCorsPreFlight } from "@/lib/cors";
 
 /**
  * Transform admin product data to client format
@@ -51,17 +52,17 @@ function transformProduct(product) {
     : null;
 
   const normalizedThumbnail = normalizeImage(
-    primaryMedia?.url || product.product_thumbnail || primaryMedia
+    primaryMedia?.url || product.product_thumbnail || primaryMedia,
   );
   const normalizedGalleries =
     Array.isArray(product.product_galleries) && product.product_galleries.length
       ? product.product_galleries.map(normalizeImage).filter(Boolean)
       : Array.isArray(product.media)
-      ? product.media
-          .filter((m) => m.type === "image")
-          .map((m) => normalizeImage(m.url || m))
-          .filter(Boolean)
-      : [];
+        ? product.media
+            .filter((m) => m.type === "image")
+            .map((m) => normalizeImage(m.url || m))
+            .filter(Boolean)
+        : [];
 
   const normalizedVariations = Array.isArray(product.variations)
     ? product.variations.map((v) => ({
@@ -83,15 +84,15 @@ function transformProduct(product) {
     price: Number.isFinite(parseFloat(product.standard_price))
       ? parseFloat(product.standard_price)
       : Number.isFinite(parseFloat(product.price))
-      ? parseFloat(product.price)
-      : 0,
+        ? parseFloat(product.price)
+        : 0,
     sale_price: Number.isFinite(parseFloat(product.sale_price))
       ? parseFloat(product.sale_price)
       : Number.isFinite(parseFloat(product.standard_price))
-      ? parseFloat(product.standard_price)
-      : Number.isFinite(parseFloat(product.price))
-      ? parseFloat(product.price)
-      : 0,
+        ? parseFloat(product.standard_price)
+        : Number.isFinite(parseFloat(product.price))
+          ? parseFloat(product.price)
+          : 0,
     discount: product.discount,
     is_featured: product.is_featured,
     shipping_days: product.shipping_days,
@@ -178,6 +179,10 @@ function transformProduct(product) {
   };
 }
 
+export async function OPTIONS(request) {
+  return handleCorsPreFlight(request);
+}
+
 export async function GET(request) {
   try {
     const searchParams = request?.nextUrl?.searchParams;
@@ -211,14 +216,14 @@ export async function GET(request) {
           if (res.ok) {
             response = res;
             console.debug(
-              `[product API] successful fetch: ${url} status=${res.status}`
+              `[product API] successful fetch: ${url} status=${res.status}`,
             );
             break;
           } else {
             const text = await res.text().catch(() => "");
             lastErrorBody = `status=${res.status} body=${text}`;
             console.debug(
-              `[product API] fetch failed: ${url} ${lastErrorBody}`
+              `[product API] fetch failed: ${url} ${lastErrorBody}`,
             );
           }
         } catch (e) {
@@ -228,11 +233,11 @@ export async function GET(request) {
 
       if (!response) {
         console.debug(
-          `[product API] all attempts failed for id=${productId}. lastError=${lastErrorBody}`
+          `[product API] all attempts failed for id=${productId}. lastError=${lastErrorBody}`,
         );
         return NextResponse.json(
           { success: false, message: "Product not found" },
-          { status: 404 }
+          { status: 404 },
         );
       }
 
@@ -257,7 +262,7 @@ export async function GET(request) {
               itm &&
               (itm._id === productId ||
                 itm.id === productId ||
-                itm.slug === productId)
+                itm.slug === productId),
           );
           productSource = found || (data.data.length ? data.data[0] : null);
         } else {
@@ -272,11 +277,11 @@ export async function GET(request) {
       if (!productSource) {
         console.debug(
           `[product API] no product object found in admin response for id=${productId}`,
-          data
+          data,
         );
         return NextResponse.json(
           { success: false, message: "Product not found" },
-          { status: 404 }
+          { status: 404 },
         );
       }
 
@@ -309,12 +314,14 @@ export async function GET(request) {
       data.data = data.data.map(transformProduct);
     }
 
-    return NextResponse.json(data);
+    const response_obj = NextResponse.json(data);
+    return setCorsHeaders(response_obj);
   } catch (error) {
     console.error("Error fetching products:", error);
-    return NextResponse.json(
+    const error_response = NextResponse.json(
       { success: false, message: "Failed to fetch products", data: [] },
-      { status: 500 }
+      { status: 500 },
     );
+    return setCorsHeaders(error_response);
   }
 }
