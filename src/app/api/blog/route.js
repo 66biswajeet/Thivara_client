@@ -21,17 +21,25 @@ export async function GET(request) {
   if (querySortBy || queryCategory || querySearch || queryTag) {
     // Filter by category
     if (queryCategory) {
-      blogs = blogs.filter((post) => post?.categories?.some((category) => queryCategory.split(",").includes(category.slug)));
+      blogs = blogs.filter((post) =>
+        post?.categories?.some((category) =>
+          queryCategory.split(",").includes(category.slug),
+        ),
+      );
     }
 
     // Filter by tag
     if (queryTag) {
-      blogs = blogs.filter((post) => post?.tags?.some((tag) => queryTag.split(",").includes(tag.slug)));
+      blogs = blogs.filter((post) =>
+        post?.tags?.some((tag) => queryTag.split(",").includes(tag.slug)),
+      );
     }
 
     // Search filter by title
     if (querySearch) {
-      blogs = blogs.filter((post) => post.title.toLowerCase().includes(querySearch.toLowerCase()));
+      blogs = blogs.filter((post) =>
+        post.title.toLowerCase().includes(querySearch.toLowerCase()),
+      );
     }
 
     // Sort logic
@@ -44,9 +52,13 @@ export async function GET(request) {
     } else if (querySortBy === "z-a") {
       blogs = blogs.sort((a, b) => b.title.localeCompare(a.title));
     } else if (querySortBy === "newest") {
-      blogs = blogs.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      blogs = blogs.sort(
+        (a, b) => new Date(b.created_at) - new Date(a.created_at),
+      );
     } else if (querySortBy === "oldest") {
-      blogs = blogs.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+      blogs = blogs.sort(
+        (a, b) => new Date(a.created_at) - new Date(b.created_at),
+      );
     }
   }
 

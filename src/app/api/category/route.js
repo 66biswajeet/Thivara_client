@@ -36,7 +36,7 @@ export async function GET(request) {
     console.error("Error fetching categories:", error);
     const error_response = NextResponse.json(
       { success: false, message: "Failed to fetch categories" },
-      { status: 500 }
+      { status: 500 },
     );
     return setCorsHeaders(error_response);
   }

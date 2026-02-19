@@ -3,7 +3,8 @@
 const nextConfig = {
   env: {
     // Use environment variables for different environments
-    API_PROD_URL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api",
+    API_PROD_URL:
+      process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api",
     ADMIN_HOST: process.env.NEXT_PUBLIC_ADMIN_HOST || "http://localhost:3000",
     storageURL: process.env.NEXT_PUBLIC_STORAGE_URL || "http://localhost:3000",
   },

@@ -48,8 +48,7 @@ export async function GET(request) {
   try {
     // Fetch categories from admin panel with tree structure
     const ADMIN_HOST = process.env.ADMIN_HOST || "http://localhost:3000";
-    const adminApiUrl =
-      `${ADMIN_HOST}/api/category?type=product&include_subcategories=true&status=1`;
+    const adminApiUrl = `${ADMIN_HOST}/api/category?type=product&include_subcategories=true&status=1`;
 
     const response = await fetch(adminApiUrl, {
       method: "GET",
@@ -97,7 +96,7 @@ export async function GET(request) {
         message: "Failed to fetch menu categories",
         error: error.message,
       },
-      { status: 500 }
+      { status: 500 },
     );
     return setCorsHeaders(error_response);
   }
