@@ -6,7 +6,14 @@ export async function GET(request) {
 
     // Forward all query parameters to the admin panel API
     const queryString = searchParams.toString();
-    const adminApiUrl = `http://localhost:3000/api/category${
+    const ADMIN_HOST =
+      process.env.ADMIN_HOST ||
+      process.env.NEXT_PUBLIC_API_URL ||
+      process.env.NEXT_PUBLIC_MULTIKART_API ||
+      new URL(request.url).origin ||
+      "http://localhost:3000";
+
+    const adminApiUrl = `${ADMIN_HOST.replace(/\/$/, "")}/api/category${
       queryString ? `?${queryString}` : ""
     }`;
 
@@ -29,7 +36,7 @@ export async function GET(request) {
     console.error("Error fetching categories:", error);
     return NextResponse.json(
       { success: false, message: "Failed to fetch categories" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

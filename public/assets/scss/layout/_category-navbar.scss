@@ -308,3 +308,16 @@
     }
   }
 }
+
+/* Override dark-mode rule for category navbar: keep white background */
+.category-navbar,
+.category-navbar-wrapper,
+.category-items,
+.category-dropdown {
+  background-color: #ffffff !important;
+  color: #222 !important;
+}
+
+.category-dropdown {
+  border-color: #e8eeff !important;
+}

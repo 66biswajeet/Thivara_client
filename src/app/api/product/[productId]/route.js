@@ -1,11 +1,19 @@
 import { NextResponse } from "next/server";
 
+const ADMIN_HOST_FALLBACK =
+  process.env.ADMIN_HOST ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  process.env.NEXT_PUBLIC_MULTIKART_API ||
+  "http://localhost:3000";
+const MULTIKART_HOST_FALLBACK =
+  process.env.NEXT_PUBLIC_MULTIKART_API || "http://localhost:3001";
+
 /**
  * Transform admin product data to client format
  */
 function transformProduct(product) {
   if (!product) return null;
-  const ADMIN_HOST = process.env.ADMIN_HOST || "http://localhost:3000";
+  const ADMIN_HOST = ADMIN_HOST_FALLBACK;
 
   const normalizeImage = (img) => {
     if (!img) return null;
@@ -175,9 +183,10 @@ export async function GET(_, { params }) {
     // Try to fetch from vendor-products API first for vendor products
     if (isObjectId || isVendorProductSlug) {
       try {
+        const multiHost = MULTIKART_HOST_FALLBACK.replace(/\/$/, "");
         const vendorProductUrl = isObjectId
-          ? `http://localhost:3001/api/vendor-products?vendor_product_id=${productId}`
-          : `http://localhost:3001/api/vendor-products?slug=${productId}`;
+          ? `${multiHost}/api/vendor-products?vendor_product_id=${productId}`
+          : `${multiHost}/api/vendor-products?slug=${productId}`;
 
         const vendorProductResponse = await fetch(vendorProductUrl, {
           method: "GET",
@@ -215,12 +224,13 @@ export async function GET(_, { params }) {
 
     // Fallback to master product - Determine whether productId is an ObjectId or a slug
     const isMasterObjectId = /^[a-fA-F0-9]{24}$/.test(productId);
+    const baseAdmin = ADMIN_HOST_FALLBACK.replace(/\/$/, "");
     const primaryUrl = isMasterObjectId
-      ? `http://localhost:3000/api/product/${productId}`
-      : `http://localhost:3000/api/product/slug/${productId}`;
+      ? `${baseAdmin}/api/product/${productId}`
+      : `${baseAdmin}/api/product/slug/${productId}`;
     const fallbackUrl = isMasterObjectId
-      ? `http://localhost:3000/api/product/slug/${productId}`
-      : `http://localhost:3000/api/product/${productId}`;
+      ? `${baseAdmin}/api/product/slug/${productId}`
+      : `${baseAdmin}/api/product/${productId}`;
 
     // Try primary URL first, then fallback URL if the first fails (covers slug vs id mismatches)
     let response = await fetch(primaryUrl, {

@@ -42,8 +42,14 @@ function transformCategoriesToMenu(categories) {
 export async function GET(request) {
   try {
     // Fetch categories from admin panel with tree structure
-    const adminApiUrl =
-      "http://localhost:3000/api/category?type=product&include_subcategories=true&status=1";
+    const ADMIN_HOST =
+      process.env.ADMIN_HOST ||
+      process.env.NEXT_PUBLIC_API_URL ||
+      process.env.NEXT_PUBLIC_MULTIKART_API ||
+      new URL(request.url).origin ||
+      "http://localhost:3000";
+
+    const adminApiUrl = `${ADMIN_HOST.replace(/\/$/, "")}/api/category?type=product&include_subcategories=true&status=1`;
 
     const response = await fetch(adminApiUrl, {
       method: "GET",
@@ -90,7 +96,7 @@ export async function GET(request) {
         message: "Failed to fetch menu categories",
         error: error.message,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

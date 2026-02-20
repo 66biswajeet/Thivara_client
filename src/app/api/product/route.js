@@ -1,5 +1,16 @@
 import { NextResponse } from "next/server";
 
+const ADMIN_HOST_FALLBACK = (
+  process.env.ADMIN_HOST ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  process.env.NEXT_PUBLIC_MULTIKART_API ||
+  "http://localhost:3000"
+)
+  // Remove any trailing `/api` portion if env was provided with it
+  .replace(/\/api\/?$/, "")
+  // Ensure no trailing slash
+  .replace(/\/$/, "");
+
 /**
  * Transform admin product data to client format
  */
@@ -16,7 +27,7 @@ function transformProduct(product) {
   // - null
   // - an object with `original_url` or `url`
   // - a string path (e.g. "/uploads/abc.png") or full URL
-  const ADMIN_HOST = process.env.ADMIN_HOST || "http://localhost:3000";
+  const ADMIN_HOST = ADMIN_HOST_FALLBACK;
 
   const normalizeImage = (img) => {
     if (!img) return null;
@@ -51,17 +62,17 @@ function transformProduct(product) {
     : null;
 
   const normalizedThumbnail = normalizeImage(
-    primaryMedia?.url || product.product_thumbnail || primaryMedia
+    primaryMedia?.url || product.product_thumbnail || primaryMedia,
   );
   const normalizedGalleries =
     Array.isArray(product.product_galleries) && product.product_galleries.length
       ? product.product_galleries.map(normalizeImage).filter(Boolean)
       : Array.isArray(product.media)
-      ? product.media
-          .filter((m) => m.type === "image")
-          .map((m) => normalizeImage(m.url || m))
-          .filter(Boolean)
-      : [];
+        ? product.media
+            .filter((m) => m.type === "image")
+            .map((m) => normalizeImage(m.url || m))
+            .filter(Boolean)
+        : [];
 
   const normalizedVariations = Array.isArray(product.variations)
     ? product.variations.map((v) => ({
@@ -83,15 +94,15 @@ function transformProduct(product) {
     price: Number.isFinite(parseFloat(product.standard_price))
       ? parseFloat(product.standard_price)
       : Number.isFinite(parseFloat(product.price))
-      ? parseFloat(product.price)
-      : 0,
+        ? parseFloat(product.price)
+        : 0,
     sale_price: Number.isFinite(parseFloat(product.sale_price))
       ? parseFloat(product.sale_price)
       : Number.isFinite(parseFloat(product.standard_price))
-      ? parseFloat(product.standard_price)
-      : Number.isFinite(parseFloat(product.price))
-      ? parseFloat(product.price)
-      : 0,
+        ? parseFloat(product.standard_price)
+        : Number.isFinite(parseFloat(product.price))
+          ? parseFloat(product.price)
+          : 0,
     discount: product.discount,
     is_featured: product.is_featured,
     shipping_days: product.shipping_days,
@@ -189,14 +200,15 @@ export async function GET(request) {
 
       // Try a series of admin endpoints in order until one returns OK
       const tryEndpoints = [];
+      const baseAdmin = ADMIN_HOST_FALLBACK.replace(/\/$/, "");
       // path style: /api/product/:id
-      tryEndpoints.push(`http://localhost:3000/api/product/${productId}`);
+      tryEndpoints.push(`${baseAdmin}/api/product/${productId}`);
       // slug path: /api/product/slug/:slug
-      tryEndpoints.push(`http://localhost:3000/api/product/slug/${productId}`);
+      tryEndpoints.push(`${baseAdmin}/api/product/slug/${productId}`);
       // query style: /api/product?id=...
-      tryEndpoints.push(`http://localhost:3000/api/product?id=${productId}`);
+      tryEndpoints.push(`${baseAdmin}/api/product?id=${productId}`);
       // query style slug param (some APIs use slug=)
-      tryEndpoints.push(`http://localhost:3000/api/product?slug=${productId}`);
+      tryEndpoints.push(`${baseAdmin}/api/product?slug=${productId}`);
 
       let response = null;
       let lastErrorBody = null;
@@ -211,14 +223,14 @@ export async function GET(request) {
           if (res.ok) {
             response = res;
             console.debug(
-              `[product API] successful fetch: ${url} status=${res.status}`
+              `[product API] successful fetch: ${url} status=${res.status}`,
             );
             break;
           } else {
             const text = await res.text().catch(() => "");
             lastErrorBody = `status=${res.status} body=${text}`;
             console.debug(
-              `[product API] fetch failed: ${url} ${lastErrorBody}`
+              `[product API] fetch failed: ${url} ${lastErrorBody}`,
             );
           }
         } catch (e) {
@@ -228,11 +240,11 @@ export async function GET(request) {
 
       if (!response) {
         console.debug(
-          `[product API] all attempts failed for id=${productId}. lastError=${lastErrorBody}`
+          `[product API] all attempts failed for id=${productId}. lastError=${lastErrorBody}`,
         );
         return NextResponse.json(
           { success: false, message: "Product not found" },
-          { status: 404 }
+          { status: 404 },
         );
       }
 
@@ -257,7 +269,7 @@ export async function GET(request) {
               itm &&
               (itm._id === productId ||
                 itm.id === productId ||
-                itm.slug === productId)
+                itm.slug === productId),
           );
           productSource = found || (data.data.length ? data.data[0] : null);
         } else {
@@ -272,11 +284,11 @@ export async function GET(request) {
       if (!productSource) {
         console.debug(
           `[product API] no product object found in admin response for id=${productId}`,
-          data
+          data,
         );
         return NextResponse.json(
           { success: false, message: "Product not found" },
-          { status: 404 }
+          { status: 404 },
         );
       }
 
@@ -286,7 +298,7 @@ export async function GET(request) {
 
     // Otherwise, fetch product list
     const queryString = searchParams.toString();
-    const adminApiUrl = `http://localhost:3000/api/product${
+    const adminApiUrl = `${ADMIN_HOST_FALLBACK.replace(/\/$/, "")}/api/product${
       queryString ? `?${queryString}` : ""
     }`;
 
@@ -313,8 +325,14 @@ export async function GET(request) {
   } catch (error) {
     console.error("Error fetching products:", error);
     return NextResponse.json(
-      { success: false, message: "Failed to fetch products", data: [] },
-      { status: 500 }
+      {
+        success: false,
+        message: "Failed to fetch products",
+        // include message to aid debugging in deployment logs / client (non-sensitive)
+        error: error?.message || String(error),
+        data: [],
+      },
+      { status: 500 },
     );
   }
 }

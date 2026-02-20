@@ -1,6 +1,7 @@
 "use client";
 import { useContext, useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import "./CategoryNavBar.scss";
 import { useTranslation } from "react-i18next";
 import request from "@/utils/axiosUtils";
 import useFetchQuery from "@/utils/hooks/useFetchQuery";
@@ -161,40 +162,38 @@ const CategoryNavBar = () => {
                       }
                     >
                       <div className="category-icon-wrapper">
-                        {category.category_image ||
-                        category.item_image ||
-                        category.category_icon ||
-                        category.image ? (
-                          <Image
-                            src={
-                              category.category_image ||
-                              category.item_image ||
-                              category.category_icon ||
-                              category.image
-                            }
-                            alt={category.name || category.title}
-                            width={64}
-                            height={64}
-                            className="category-icon"
-                            unoptimized
-                            onError={(e) => {
-                              console.error(
-                                `Image failed to load for ${category.name}:`,
-                                e.target.src,
-                              );
-                              e.target.style.display = "none";
-                              e.target.parentElement.innerHTML = `<div class="category-icon-placeholder"><span class="category-icon-letter">${(category.name || "C").charAt(0).toUpperCase()}</span></div>`;
-                            }}
-                          />
-                        ) : (
-                          <div className="category-icon-placeholder">
-                            <span className="category-icon-letter">
-                              {(category.name || category.title || "C")
-                                .charAt(0)
-                                .toUpperCase()}
-                            </span>
-                          </div>
-                        )}
+                        <div className="category-icon-circle">
+                          {category.category_image ||
+                          category.item_image ||
+                          category.category_icon ||
+                          category.image ? (
+                            <Image
+                              src={
+                                category.category_image ||
+                                category.item_image ||
+                                category.category_icon ||
+                                category.image
+                              }
+                              alt={category.name || category.title}
+                              width={62}
+                              height={62}
+                              className="category-icon"
+                              unoptimized
+                              onError={(e) => {
+                                e.target.style.display = "none";
+                                e.target.parentElement.innerHTML = `<div class="category-icon-placeholder"><span class="category-icon-letter">${(category.name || "C").charAt(0).toUpperCase()}</span></div>`;
+                              }}
+                            />
+                          ) : (
+                            <div className="category-icon-placeholder">
+                              <span className="category-icon-letter">
+                                {(category.name || category.title || "C")
+                                  .charAt(0)
+                                  .toUpperCase()}
+                              </span>
+                            </div>
+                          )}
+                        </div>
                       </div>
                       <span className="category-name">
                         {category.name || category.title}
@@ -216,8 +215,10 @@ const CategoryNavBar = () => {
                 <div className="category-item category-more">
                   <div className="category-link">
                     <div className="category-icon-wrapper">
-                      <div className="category-icon-placeholder">
-                        <span className="category-icon-letter">•••</span>
+                      <div className="category-icon-circle">
+                        <div className="category-icon-placeholder">
+                          <span className="category-icon-letter">•••</span>
+                        </div>
                       </div>
                     </div>
                     <span className="category-name">
