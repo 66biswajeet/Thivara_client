@@ -11,7 +11,6 @@ export async function GET(request) {
 
     // Forward all query parameters to the admin panel API
     const queryString = searchParams.toString();
-<<<<<<< HEAD
     const ADMIN_HOST =
       process.env.ADMIN_HOST ||
       process.env.NEXT_PUBLIC_API_URL ||
@@ -20,10 +19,6 @@ export async function GET(request) {
       "http://localhost:3000";
 
     const adminApiUrl = `${ADMIN_HOST.replace(/\/$/, "")}/api/category${
-=======
-    const ADMIN_HOST = process.env.ADMIN_HOST || "http://localhost:3000";
-    const adminApiUrl = `${ADMIN_HOST}/api/category${
->>>>>>> c3a63f2119f5fda8178f83991f69e378b1a87159
       queryString ? `?${queryString}` : ""
     }`;
 

@@ -208,7 +208,6 @@ export async function GET(request) {
       const tryEndpoints = [];
       const baseAdmin = ADMIN_HOST_FALLBACK.replace(/\/$/, "");
       // path style: /api/product/:id
-<<<<<<< HEAD
       tryEndpoints.push(`${baseAdmin}/api/product/${productId}`);
       // slug path: /api/product/slug/:slug
       tryEndpoints.push(`${baseAdmin}/api/product/slug/${productId}`);
@@ -216,15 +215,6 @@ export async function GET(request) {
       tryEndpoints.push(`${baseAdmin}/api/product?id=${productId}`);
       // query style slug param (some APIs use slug=)
       tryEndpoints.push(`${baseAdmin}/api/product?slug=${productId}`);
-=======
-      tryEndpoints.push(`${ADMIN_HOST}/api/product/${productId}`);
-      // slug path: /api/product/slug/:slug
-      tryEndpoints.push(`${ADMIN_HOST}/api/product/slug/${productId}`);
-      // query style: /api/product?id=...
-      tryEndpoints.push(`${ADMIN_HOST}/api/product?id=${productId}`);
-      // query style slug param (some APIs use slug=)
-      tryEndpoints.push(`${ADMIN_HOST}/api/product?slug=${productId}`);
->>>>>>> c3a63f2119f5fda8178f83991f69e378b1a87159
 
       let response = null;
       let lastErrorBody = null;
@@ -314,12 +304,7 @@ export async function GET(request) {
 
     // Otherwise, fetch product list
     const queryString = searchParams.toString();
-<<<<<<< HEAD
     const adminApiUrl = `${ADMIN_HOST_FALLBACK.replace(/\/$/, "")}/api/product${
-=======
-    const ADMIN_HOST = process.env.ADMIN_HOST || "http://localhost:3000";
-    const adminApiUrl = `${ADMIN_HOST}/api/product${
->>>>>>> c3a63f2119f5fda8178f83991f69e378b1a87159
       queryString ? `?${queryString}` : ""
     }`;
 
@@ -346,7 +331,6 @@ export async function GET(request) {
     return setCorsHeaders(response_obj);
   } catch (error) {
     console.error("Error fetching products:", error);
-<<<<<<< HEAD
     return NextResponse.json(
       {
         success: false,
@@ -355,10 +339,6 @@ export async function GET(request) {
         error: error?.message || String(error),
         data: [],
       },
-=======
-    const error_response = NextResponse.json(
-      { success: false, message: "Failed to fetch products", data: [] },
->>>>>>> c3a63f2119f5fda8178f83991f69e378b1a87159
       { status: 500 },
     );
     return setCorsHeaders(error_response);

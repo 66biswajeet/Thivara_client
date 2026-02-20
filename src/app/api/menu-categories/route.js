@@ -47,7 +47,6 @@ export async function OPTIONS(request) {
 export async function GET(request) {
   try {
     // Fetch categories from admin panel with tree structure
-<<<<<<< HEAD
     const ADMIN_HOST =
       process.env.ADMIN_HOST ||
       process.env.NEXT_PUBLIC_API_URL ||
@@ -56,10 +55,6 @@ export async function GET(request) {
       "http://localhost:3000";
 
     const adminApiUrl = `${ADMIN_HOST.replace(/\/$/, "")}/api/category?type=product&include_subcategories=true&status=1`;
-=======
-    const ADMIN_HOST = process.env.ADMIN_HOST || "http://localhost:3000";
-    const adminApiUrl = `${ADMIN_HOST}/api/category?type=product&include_subcategories=true&status=1`;
->>>>>>> c3a63f2119f5fda8178f83991f69e378b1a87159
 
     const response = await fetch(adminApiUrl, {
       method: "GET",
