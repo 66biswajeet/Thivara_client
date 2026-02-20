@@ -13,9 +13,9 @@ const HomeSlider = ({ bannerData, height, width, sliderClass }) => {
   useEffect(() => {
     const fetchCustomization = async () => {
       try {
-        const apiUrl =
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-        const response = await fetch(`${apiUrl}/api/store-customization`);
+        // Use a relative URL so it always calls this Next.js app's own API route,
+        // regardless of environment (local or deployed).
+        const response = await fetch(`/api/store-customization`);
         const data = await response.json();
 
         if (data.success && data.data?.carousel_images?.length > 0) {

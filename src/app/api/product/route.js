@@ -313,11 +313,20 @@ export async function GET(request) {
       headers: {
         "Content-Type": "application/json",
       },
-      cache: "no-store", // Ensure fresh data
+      cache: "no-store",
     });
 
     if (!response.ok) {
-      throw new Error("Failed to fetch products from admin panel");
+      const errText = await response.text().catch(() => "");
+      console.error(
+        `[product API] backend returned ${response.status} for ${adminApiUrl}: ${errText}`,
+      );
+      // Return empty list gracefully instead of 500
+      const emptyResp = NextResponse.json(
+        { success: true, data: [], total: 0, message: "No products found" },
+        { status: 200 },
+      );
+      return setCorsHeaders(emptyResp);
     }
 
     const data = await response.json();
@@ -331,11 +340,10 @@ export async function GET(request) {
     return setCorsHeaders(response_obj);
   } catch (error) {
     console.error("Error fetching products:", error);
-    return NextResponse.json(
+    const error_response = NextResponse.json(
       {
         success: false,
         message: "Failed to fetch products",
-        // include message to aid debugging in deployment logs / client (non-sensitive)
         error: error?.message || String(error),
         data: [],
       },
