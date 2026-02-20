@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 
 export async function middleware(request) {
-  const {
-    nextUrl: { search },
-  } = request;
-  const urlSearchParams = new URLSearchParams(search);
-  const params = Object.fromEntries(urlSearchParams.entries());
+  try {
+    const {
+      nextUrl: { search },
+    } = request;
+    const urlSearchParams = new URLSearchParams(search);
+    const params = Object.fromEntries(urlSearchParams.entries());
 
+<<<<<<< HEAD
   let myHeaders = new Headers();
   myHeaders.append(
     "Authorization",
@@ -62,16 +64,25 @@ export async function middleware(request) {
 
   const path = request.nextUrl.pathname;
   if (request.cookies.has("maintenance") && path !== `/maintenance`) {
+=======
+>>>>>>> c3a63f2119f5fda8178f83991f69e378b1a87159
     let myHeaders = new Headers();
     myHeaders.append(
       "Authorization",
       `Bearer ${request.cookies.get("uat")?.value}`,
     );
+<<<<<<< HEAD
+=======
+    myHeaders.append("Content-Type", "application/json");
+
+>>>>>>> c3a63f2119f5fda8178f83991f69e378b1a87159
     let requestOptions = {
       method: "GET",
       headers: myHeaders,
+      mode: "cors",
     };
 
+<<<<<<< HEAD
     // reuse previously-fetched settings when available, otherwise try a guarded fetch
     let data = settingData;
     if (!data || Object.keys(data).length === 0) {
@@ -102,15 +113,81 @@ export async function middleware(request) {
       return NextResponse.redirect(new URL(`/maintenance`, request.url));
     } else {
       if (request.cookies.get("maintenance")) {
+=======
+    let settingData = null;
+    try {
+      const response = await fetch(
+        process.env.API_PROD_URL + "/settings",
+        requestOptions,
+      );
+      if (response.ok) {
+        settingData = await response.json();
+      }
+    } catch (fetchError) {
+      console.error("Settings fetch error:", fetchError);
+      settingData = null;
+    }
+
+    const protectedRoutes = [
+      `/account/dashboard`,
+      `/account/notification`,
+      `/account/wallet`,
+      `/account/bank-details`,
+      `/account/point`,
+      `/account/refund`,
+      `/account/order`,
+      `/account/addresses`,
+      `/wishlist`,
+      `/compare`,
+    ];
+
+    const path = request.nextUrl.pathname;
+
+    if (request.cookies.has("maintenance") && path !== `/maintenance`) {
+      try {
+        let myHeaders = new Headers();
+        myHeaders.append(
+          "Authorization",
+          `Bearer ${request.cookies.get("uat")?.value}`,
+        );
+        myHeaders.append("Content-Type", "application/json");
+        let requestOptions = {
+          method: "GET",
+          headers: myHeaders,
+          mode: "cors",
+        };
+
+        let response = await fetch(
+          process.env.API_PROD_URL + "/settings",
+          requestOptions,
+        );
+        if (!response.ok) {
+          return NextResponse.next();
+        }
+        let data = await response.json();
+
+        if (
+          data?.values?.maintenance?.maintenance_mode &&
+          path !== `/maintenance`
+        ) {
+          return NextResponse.redirect(new URL(`/maintenance`, request.url));
+        } else {
+          if (request.cookies.get("maintenance")) {
+            return NextResponse.next();
+          } else {
+            const response = NextResponse.next();
+            response.cookies.delete("maintenance");
+            return NextResponse.redirect(new URL(`/`, request.url));
+          }
+        }
+      } catch (error) {
+        console.error("Maintenance check error:", error);
+>>>>>>> c3a63f2119f5fda8178f83991f69e378b1a87159
         return NextResponse.next();
-      } else {
-        const response = NextResponse.next();
-        response.cookies.delete("maintenance");
-        return NextResponse.redirect(new URL(`/`, request.url));
       }
     }
-  }
 
+<<<<<<< HEAD
   if (protectedRoutes.includes(path) && !request.cookies.has("uat")) {
     const response = NextResponse.redirect(
       new URL(request?.cookies?.get("currentPath").value, request.url),
@@ -118,29 +195,33 @@ export async function middleware(request) {
     response.cookies.set("showAuthToast", "true", { httpOnly: false });
     return response;
   }
+=======
+    if (protectedRoutes.includes(path) && !request.cookies.has("uat")) {
+      const currentPath = request?.cookies?.get("currentPath")?.value || "/";
+      const response = NextResponse.redirect(new URL(currentPath, request.url));
+      response.cookies.set("showAuthToast", "true", { httpOnly: false });
+      return response;
+    }
+>>>>>>> c3a63f2119f5fda8178f83991f69e378b1a87159
 
-  if (!request.cookies.has("maintenance") && path == `/maintenance`) {
-    return NextResponse.redirect(new URL(`/`, request.url));
-  }
+    if (!request.cookies.has("maintenance") && path === `/maintenance`) {
+      return NextResponse.redirect(new URL(`/`, request.url));
+    }
 
-  if (path == `/checkout` && !request.cookies.has("uat")) {
-    if (settingData?.values?.activation?.guest_checkout) {
-      if (request.cookies.get("cartData") == "digital") {
+    if (path === `/checkout` && !request.cookies.has("uat")) {
+      if (settingData?.values?.activation?.guest_checkout) {
+        if (request.cookies.get("cartData") === "digital") {
+          return NextResponse.redirect(new URL(`/auth/login`, request.url));
+        }
+      } else {
         return NextResponse.redirect(new URL(`/auth/login`, request.url));
       }
-    } else {
-      return NextResponse.redirect(new URL(`/auth/login`, request.url));
     }
-  }
 
-  if (path == `/auth/login` && request.cookies.has("uat")) {
-    return NextResponse.redirect(new URL(`/`, request.url));
-  }
-
-  if (path != `/auth/login`) {
-    if (path == `/auth/otp-verification` && !request.cookies.has("ue")) {
-      return NextResponse.redirect(new URL(`/auth/login`, request.url));
+    if (path === `/auth/login` && request.cookies.has("uat")) {
+      return NextResponse.redirect(new URL(`/`, request.url));
     }
+<<<<<<< HEAD
     if (
       path == `/auth/update-password` &&
       (!request.cookies.has("uo") || !request.cookies.has("ue"))
@@ -148,8 +229,28 @@ export async function middleware(request) {
       return NextResponse.redirect(new URL(`/auth/login`, request.url));
     }
   }
+=======
+>>>>>>> c3a63f2119f5fda8178f83991f69e378b1a87159
 
-  if (request.headers.get("x-redirected")) {
+    if (path !== `/auth/login`) {
+      if (path === `/auth/otp-verification` && !request.cookies.has("ue")) {
+        return NextResponse.redirect(new URL(`/auth/login`, request.url));
+      }
+      if (
+        path === `/auth/update-password` &&
+        (!request.cookies.has("uo") || !request.cookies.has("ue"))
+      ) {
+        return NextResponse.redirect(new URL(`/auth/login`, request.url));
+      }
+    }
+
+    if (request.headers.get("x-redirected")) {
+      return NextResponse.next();
+    }
+
+    return NextResponse.next();
+  } catch (error) {
+    console.error("Middleware error:", error);
     return NextResponse.next();
   }
 }

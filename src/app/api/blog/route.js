@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
+import { setCorsHeaders, handleCorsPreFlight } from "@/lib/cors";
 import blog from "./blog.json";
+
+export async function OPTIONS(request) {
+  return handleCorsPreFlight(request);
+}
 
 export async function GET(request) {
   const searchParams = request?.nextUrl?.searchParams;
@@ -16,17 +21,25 @@ export async function GET(request) {
   if (querySortBy || queryCategory || querySearch || queryTag) {
     // Filter by category
     if (queryCategory) {
-      blogs = blogs.filter((post) => post?.categories?.some((category) => queryCategory.split(",").includes(category.slug)));
+      blogs = blogs.filter((post) =>
+        post?.categories?.some((category) =>
+          queryCategory.split(",").includes(category.slug),
+        ),
+      );
     }
 
     // Filter by tag
     if (queryTag) {
-      blogs = blogs.filter((post) => post?.tags?.some((tag) => queryTag.split(",").includes(tag.slug)));
+      blogs = blogs.filter((post) =>
+        post?.tags?.some((tag) => queryTag.split(",").includes(tag.slug)),
+      );
     }
 
     // Search filter by title
     if (querySearch) {
-      blogs = blogs.filter((post) => post.title.toLowerCase().includes(querySearch.toLowerCase()));
+      blogs = blogs.filter((post) =>
+        post.title.toLowerCase().includes(querySearch.toLowerCase()),
+      );
     }
 
     // Sort logic
@@ -39,9 +52,13 @@ export async function GET(request) {
     } else if (querySortBy === "z-a") {
       blogs = blogs.sort((a, b) => b.title.localeCompare(a.title));
     } else if (querySortBy === "newest") {
-      blogs = blogs.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      blogs = blogs.sort(
+        (a, b) => new Date(b.created_at) - new Date(a.created_at),
+      );
     } else if (querySortBy === "oldest") {
-      blogs = blogs.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+      blogs = blogs.sort(
+        (a, b) => new Date(a.created_at) - new Date(b.created_at),
+      );
     }
   }
 
@@ -61,5 +78,6 @@ export async function GET(request) {
     data: paginatedBlogs, // the blogs for the current page
   };
 
-  return NextResponse.json(response);
+  const response_obj = NextResponse.json(response);
+  return setCorsHeaders(response_obj);
 }

@@ -8,7 +8,6 @@ import Slider from "react-slick";
 const HomeSlider = ({ bannerData, height, width, sliderClass }) => {
   const videoType = ["mp4", "webm", "ogg"];
   const [customBanners, setCustomBanners] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
 
   // Fetch store customization data
   useEffect(() => {
@@ -32,8 +31,6 @@ const HomeSlider = ({ bannerData, height, width, sliderClass }) => {
         }
       } catch (error) {
         console.error("Failed to fetch store customization:", error);
-      } finally {
-        setIsLoading(false);
       }
     };
 
@@ -43,46 +40,15 @@ const HomeSlider = ({ bannerData, height, width, sliderClass }) => {
   // Use custom banners if available, otherwise fall back to bannerData
   const displayBanners = customBanners || bannerData;
 
-  if (isLoading) {
-    return (
-      <div
-        className="position-relative"
-        style={{ height: height || 325, background: "#f0f0f0" }}
-      >
-        <div className="home-skeleton">
-          <div className="skeleton-content">
-            <div className="container">
-              <div className="row">
-                <div className="col-lg-7 col-sm-8 col-11">
-                  <p className="card-text placeholder-glow row g-lg-4 g-sm-3 g-2">
-                    <span className="col-7">
-                      <span className="placeholder"></span>
-                    </span>
-                    <span className="col-9">
-                      <span className="placeholder"></span>
-                    </span>
-                    <span className="col-6">
-                      <span className="placeholder"></span>
-                    </span>
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <>
       <div className="position-relative">
-        {bannerData?.banners?.length > 1 ? (
+        {displayBanners?.banners?.length > 1 ? (
           <Slider
             {...homeBannerSettings}
             className={sliderClass ? sliderClass : ""}
           >
-            {bannerData?.banners?.map((banner, index) => {
+            {displayBanners?.banners?.map((banner, index) => {
               if (
                 videoType.includes(
                   banner &&
@@ -156,13 +122,14 @@ const HomeSlider = ({ bannerData, height, width, sliderClass }) => {
             })}
           </Slider>
         ) : videoType.includes(
-            (bannerData?.banners?.[0] || bannerData) &&
-              (bannerData?.banners?.[0]?.image_url || bannerData?.image_url) &&
-              (bannerData?.banners?.[0]?.image_url?.substring(
-                bannerData?.banners?.[0]?.image_url?.lastIndexOf(".") + 1,
+            (displayBanners?.banners?.[0] || displayBanners) &&
+              (displayBanners?.banners?.[0]?.image_url ||
+                displayBanners?.image_url) &&
+              (displayBanners?.banners?.[0]?.image_url?.substring(
+                displayBanners?.banners?.[0]?.image_url?.lastIndexOf(".") + 1,
               ) ||
-                bannerData?.image_url?.substring(
-                  bannerData?.image_url?.lastIndexOf(".") + 1,
+                displayBanners?.image_url?.substring(
+                  displayBanners?.image_url?.lastIndexOf(".") + 1,
                 )),
           ) ? (
           <div
@@ -203,8 +170,8 @@ const HomeSlider = ({ bannerData, height, width, sliderClass }) => {
               >
                 <source
                   src={
-                    storageURL + bannerData?.banners?.[0]?.image_url ||
-                    bannerData?.image_url
+                    storageURL + displayBanners?.banners?.[0]?.image_url ||
+                    displayBanners?.image_url
                   }
                   type="video/mp4"
                 />
@@ -213,33 +180,12 @@ const HomeSlider = ({ bannerData, height, width, sliderClass }) => {
           </div>
         ) : (
           <ImageLink
-            imgUrl={bannerData?.banners?.[0] || bannerData}
+            imgUrl={displayBanners?.banners?.[0] || displayBanners}
             placeholder={`${ImagePath}/banner.png`}
             height={height}
             width={width}
           />
         )}
-        <div className="home-skeleton">
-          <div className="skeleton-content">
-            <div className="container">
-              <div className="row">
-                <div className="col-lg-7 col-sm-8 col-11">
-                  <p className="card-text placeholder-glow row g-lg-4 g-sm-3 g-2">
-                    <span className="col-7">
-                      <span className="placeholder"></span>
-                    </span>
-                    <span className="col-9">
-                      <span className="placeholder"></span>
-                    </span>
-                    <span className="col-6">
-                      <span className="placeholder"></span>
-                    </span>
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </>
   );

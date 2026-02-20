@@ -2,9 +2,11 @@
 
 const nextConfig = {
   env: {
-    // Change below URL with your current domain
-    API_PROD_URL: "http://localhost:3000/api",
-    storageURL: "http://localhost:3000",
+    // Use environment variables for different environments
+    API_PROD_URL:
+      process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api",
+    ADMIN_HOST: process.env.NEXT_PUBLIC_ADMIN_HOST || "http://localhost:3000",
+    storageURL: process.env.NEXT_PUBLIC_STORAGE_URL || "http://localhost:3000",
   },
 
   images: {

@@ -1,4 +1,9 @@
 import { NextResponse } from "next/server";
+import { setCorsHeaders, handleCorsPreFlight } from "@/lib/cors";
+
+export async function OPTIONS(request) {
+  return handleCorsPreFlight(request);
+}
 
 export async function GET(request) {
   try {
@@ -6,6 +11,7 @@ export async function GET(request) {
 
     // Forward all query parameters to the admin panel API
     const queryString = searchParams.toString();
+<<<<<<< HEAD
     const ADMIN_HOST =
       process.env.ADMIN_HOST ||
       process.env.NEXT_PUBLIC_API_URL ||
@@ -14,6 +20,10 @@ export async function GET(request) {
       "http://localhost:3000";
 
     const adminApiUrl = `${ADMIN_HOST.replace(/\/$/, "")}/api/category${
+=======
+    const ADMIN_HOST = process.env.ADMIN_HOST || "http://localhost:3000";
+    const adminApiUrl = `${ADMIN_HOST}/api/category${
+>>>>>>> c3a63f2119f5fda8178f83991f69e378b1a87159
       queryString ? `?${queryString}` : ""
     }`;
 
@@ -31,12 +41,14 @@ export async function GET(request) {
     }
 
     const data = await response.json();
-    return NextResponse.json(data);
+    const response_obj = NextResponse.json(data);
+    return setCorsHeaders(response_obj);
   } catch (error) {
     console.error("Error fetching categories:", error);
-    return NextResponse.json(
+    const error_response = NextResponse.json(
       { success: false, message: "Failed to fetch categories" },
       { status: 500 },
     );
+    return setCorsHeaders(error_response);
   }
 }

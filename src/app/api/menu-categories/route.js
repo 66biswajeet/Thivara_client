@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { setCorsHeaders, handleCorsPreFlight } from "@/lib/cors";
 
 /**
  * Transform categories into menu format
@@ -39,9 +40,14 @@ function transformCategoriesToMenu(categories) {
   });
 }
 
+export async function OPTIONS(request) {
+  return handleCorsPreFlight(request);
+}
+
 export async function GET(request) {
   try {
     // Fetch categories from admin panel with tree structure
+<<<<<<< HEAD
     const ADMIN_HOST =
       process.env.ADMIN_HOST ||
       process.env.NEXT_PUBLIC_API_URL ||
@@ -50,6 +56,10 @@ export async function GET(request) {
       "http://localhost:3000";
 
     const adminApiUrl = `${ADMIN_HOST.replace(/\/$/, "")}/api/category?type=product&include_subcategories=true&status=1`;
+=======
+    const ADMIN_HOST = process.env.ADMIN_HOST || "http://localhost:3000";
+    const adminApiUrl = `${ADMIN_HOST}/api/category?type=product&include_subcategories=true&status=1`;
+>>>>>>> c3a63f2119f5fda8178f83991f69e378b1a87159
 
     const response = await fetch(adminApiUrl, {
       method: "GET",
@@ -73,7 +83,7 @@ export async function GET(request) {
     const menuItems = transformCategoriesToMenu(data.data);
 
     // Return in the expected menu format
-    return NextResponse.json({
+    const response_obj = NextResponse.json({
       current_page: 1,
       data: menuItems,
       first_page_url: null,
@@ -88,9 +98,10 @@ export async function GET(request) {
       to: menuItems.length,
       total: menuItems.length,
     });
+    return setCorsHeaders(response_obj);
   } catch (error) {
     console.error("Error fetching menu categories:", error);
-    return NextResponse.json(
+    const error_response = NextResponse.json(
       {
         success: false,
         message: "Failed to fetch menu categories",
@@ -98,5 +109,6 @@ export async function GET(request) {
       },
       { status: 500 },
     );
+    return setCorsHeaders(error_response);
   }
 }

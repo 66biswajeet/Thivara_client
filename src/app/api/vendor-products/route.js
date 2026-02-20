@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { setCorsHeaders, handleCorsPreFlight } from "@/lib/cors";
 
 /**
  * Transform vendor product data to client format
@@ -108,11 +109,15 @@ function transformVendorProduct(product) {
 
     // Other attributes
     slug: product.slug,
-    status: product.status,
+    status: product.status || 1,
     is_active: product.is_active,
     attribute_values: product.attribute_values || [],
     variant_values: product.variant_values || [],
     selected_variants: product.selected_variants || {},
+<<<<<<< HEAD
+=======
+    type: product.type || "simple", // Ensure type is set (default to simple)
+>>>>>>> c3a63f2119f5fda8178f83991f69e378b1a87159
 
     // Metadata
     created_at: product.created_at,
@@ -133,6 +138,10 @@ function transformVendorProduct(product) {
   };
 }
 
+export async function OPTIONS(request) {
+  return handleCorsPreFlight(request);
+}
+
 export async function GET(request) {
   try {
     const searchParams = request?.nextUrl?.searchParams;
@@ -142,6 +151,7 @@ export async function GET(request) {
     console.log("📦 Client Vendor Products API - Params:", queryString);
 
     // Forward request to admin panel vendor-products API
+<<<<<<< HEAD
     const ADMIN_HOST_FOR_FETCH =
       process.env.ADMIN_HOST ||
       process.env.NEXT_PUBLIC_API_URL ||
@@ -150,6 +160,10 @@ export async function GET(request) {
       "http://localhost:3000";
 
     const adminApiUrl = `${ADMIN_HOST_FOR_FETCH.replace(/\/$/, "")}/api/vendor-products${
+=======
+    const ADMIN_HOST = process.env.ADMIN_HOST || "http://localhost:3000";
+    const adminApiUrl = `${ADMIN_HOST}/api/vendor-products${
+>>>>>>> c3a63f2119f5fda8178f83991f69e378b1a87159
       queryString ? `?${queryString}` : ""
     }`;
 
@@ -167,10 +181,11 @@ export async function GET(request) {
         response.status,
         response.statusText,
       );
-      return NextResponse.json(
+      const error_response = NextResponse.json(
         { success: false, message: "Failed to fetch vendor products" },
         { status: response.status },
       );
+      return setCorsHeaders(error_response);
     }
 
     const data = await response.json();
@@ -199,16 +214,23 @@ export async function GET(request) {
           product.id,
           product.vendor_name,
         );
+<<<<<<< HEAD
         return NextResponse.json(product);
+=======
+        const response_obj = NextResponse.json(product);
+        return setCorsHeaders(response_obj);
+>>>>>>> c3a63f2119f5fda8178f83991f69e378b1a87159
       }
     }
 
-    return NextResponse.json(data);
+    const response_obj = NextResponse.json(data);
+    return setCorsHeaders(response_obj);
   } catch (error) {
     console.error("❌ Client vendor-products API error:", error);
-    return NextResponse.json(
+    const error_response = NextResponse.json(
       { success: false, message: error.message },
       { status: 500 },
     );
+    return setCorsHeaders(error_response);
   }
 }

@@ -196,14 +196,22 @@ export async function GET(_, { params }) {
 
         if (vendorProductResponse.ok) {
           const vendorData = await vendorProductResponse.json();
-          // Find the specific vendor product
-          const vendorProduct = isObjectId
-            ? vendorData.data?.find(
-                (p) =>
-                  p.vendor_product_id?.toString() === productId ||
-                  p.id?.toString() === productId,
-              )
-            : vendorData.data?.find((p) => p.slug === productId);
+          // Handle both cases: single product object or array in data
+          let vendorProduct = null;
+
+          if (vendorData.id || vendorData.vendor_product_id) {
+            // vendor-products API returned a single product object directly
+            vendorProduct = vendorData;
+          } else if (vendorData.data && Array.isArray(vendorData.data)) {
+            // vendor-products API returned array in data field
+            vendorProduct = isObjectId
+              ? vendorData.data.find(
+                  (p) =>
+                    p.vendor_product_id?.toString() === productId ||
+                    p.id?.toString() === productId,
+                )
+              : vendorData.data.find((p) => p.slug === productId);
+          }
 
           if (vendorProduct) {
             console.log(
@@ -224,6 +232,7 @@ export async function GET(_, { params }) {
 
     // Fallback to master product - Determine whether productId is an ObjectId or a slug
     const isMasterObjectId = /^[a-fA-F0-9]{24}$/.test(productId);
+<<<<<<< HEAD
     const baseAdmin = ADMIN_HOST_FALLBACK.replace(/\/$/, "");
     const primaryUrl = isMasterObjectId
       ? `${baseAdmin}/api/product/${productId}`
@@ -231,6 +240,15 @@ export async function GET(_, { params }) {
     const fallbackUrl = isMasterObjectId
       ? `${baseAdmin}/api/product/slug/${productId}`
       : `${baseAdmin}/api/product/${productId}`;
+=======
+    const ADMIN_HOST = process.env.ADMIN_HOST || "http://localhost:3000";
+    const primaryUrl = isMasterObjectId
+      ? `${ADMIN_HOST}/api/product/${productId}`
+      : `${ADMIN_HOST}/api/product/slug/${productId}`;
+    const fallbackUrl = isMasterObjectId
+      ? `${ADMIN_HOST}/api/product/slug/${productId}`
+      : `${ADMIN_HOST}/api/product/${productId}`;
+>>>>>>> c3a63f2119f5fda8178f83991f69e378b1a87159
 
     // Try primary URL first, then fallback URL if the first fails (covers slug vs id mismatches)
     let response = await fetch(primaryUrl, {

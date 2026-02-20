@@ -31,7 +31,7 @@ const ProductDetailContent = ({ slug, productId }) => {
   const isProductLayout = useMemo(() => {
     return queryProductLayout
       ? queryProductLayout
-      : themeOption?.product?.product_layout ?? "product_thumbnail";
+      : (themeOption?.product?.product_layout ?? "product_thumbnail");
   }, [queryProductLayout, themeOption]);
 
   const [productState, setProductState] = useState({
@@ -50,13 +50,13 @@ const ProductDetailContent = ({ slug, productId }) => {
     error,
   } = useFetchQuery(
     ["client-product", productId || slug],
-    () => fetch(`/api/product?id=${productId || slug}`).then((r) => r.json()),
+    () => fetch(`/api/product/${productId || slug}`).then((r) => r.json()),
     {
       enabled: Boolean(productId || slug),
       refetchOnWindowFocus: false,
       select: (res) => res,
       staleTime: 0,
-    }
+    },
   );
 
   // Setting Product API Data on state Variable and getting ids from cross_sell_products,related_products;
@@ -69,7 +69,7 @@ const ProductDetailContent = ({ slug, productId }) => {
             new Set([
               ...ProductData?.cross_sell_products,
               ...ProductData?.related_products,
-            ])
+            ]),
           ).join(","),
         });
       setProductState((prev) => ({ ...prev, product: ProductData }));
@@ -77,7 +77,7 @@ const ProductDetailContent = ({ slug, productId }) => {
         "[ProductDetail] slug, productId, ProductData.id:",
         slug,
         productId,
-        ProductData?.id || ProductData?._id
+        ProductData?.id || ProductData?._id,
       );
     }
   }, [ProductData]);
